@@ -1,30 +1,36 @@
-import heapq
-
+def find(x):
+    global parent
+    if parent[x] == x:
+        return x
+    else:
+        return find(parent[x])
+    
+def Union(x,y):
+    Px, Py = find(x), find(y)
+    
+    if Px>Py:
+        parent[Px] = Py
+    else:
+        parent[Py] = Px
+        
 V, E = map(int, input().split())
 
 graph = [[] for _ in range(V+1)]
+edges = []
+
 for _ in range(E):
     s,e,c = map(int,input().split())
-    graph[s].append([e,c])
-    graph[e].append([s,c])
+    graph[s].append((c,e))
+    edges.append((c,s,e))
     
+edges.sort()
+parent = [i for i in range(V+1)]
 answer = 0
-visit = [False]*(V+1)
-q = []
-heapq.heappush(q, (0,1))
-cnt = 0
 
-while q:
-    weight, location = heapq.heappop(q)
-    if not visit[location]:
-        answer+= weight
-        visit[location] = True
-        cnt+=1
-        
-        for loc,w in graph[location]:
-            if not visit[loc]:
-                heapq.heappush(q, (w, loc))
+for i in edges:
+    if find(i[1])==find(i[2]):
+        continue
+    Union(i[1], i[2])
+    answer+=i[0]
     
-    if cnt==V:
-        break
 print(answer)
